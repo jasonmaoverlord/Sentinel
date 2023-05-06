@@ -35,7 +35,7 @@ public class FlowRuleNacosPublisher implements DynamicRulePublisher<List<FlowRul
     @Autowired
     private ConfigService configService;
     @Autowired
-    private Converter<List<FlowRuleEntity>, String> converter;
+    private Converter<List<FlowRuleEntity>, String> entityEncoder;
 
     @Override
     public void publish(String app, List<FlowRuleEntity> rules) throws Exception {
@@ -44,6 +44,6 @@ public class FlowRuleNacosPublisher implements DynamicRulePublisher<List<FlowRul
             return;
         }
         configService.publishConfig(app + NacosConfigUtil.FLOW_DATA_ID_POSTFIX,
-            NacosConfigUtil.GROUP_ID, converter.convert(rules));
+                NacosConfigUtil.GROUP_ID, entityEncoder.convert(rules));
     }
 }
