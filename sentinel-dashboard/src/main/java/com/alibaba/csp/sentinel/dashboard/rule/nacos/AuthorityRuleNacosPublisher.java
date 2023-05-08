@@ -15,8 +15,8 @@
  */
 package com.alibaba.csp.sentinel.dashboard.rule.nacos;
 
-import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.ParamFlowRuleCorrectEntity;
-import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.ParamFlowRuleEntity;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.AuthorityRuleCorrectEntity;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.AuthorityRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.rule.DynamicRulePublisher;
 import com.alibaba.csp.sentinel.datasource.Converter;
 import com.alibaba.csp.sentinel.util.AssertUtil;
@@ -33,33 +33,29 @@ import java.util.stream.Collectors;
  * @date 2023/5/8 4:10 下午
  * @description
  */
-@Component("paramFlowRuleNacosPublisher")
-public class ParamFlowRuleNacosPublisher implements DynamicRulePublisher<List<ParamFlowRuleEntity>> {
+@Component("authorityRuleNacosPublisher")
+public class AuthorityRuleNacosPublisher implements DynamicRulePublisher<List<AuthorityRuleEntity>> {
 
     @Autowired
     private ConfigService configService;
     @Autowired
-    private Converter<List<ParamFlowRuleCorrectEntity>, String> entityEncoder;
+    private Converter<List<AuthorityRuleCorrectEntity>, String> entityEncoder;
 
     @Override
-    public void publish(String app, List<ParamFlowRuleEntity> rules) throws Exception {
+    public void publish(String app, List<AuthorityRuleEntity> rules) throws Exception {
         AssertUtil.notEmpty(app, "app name cannot be empty");
         if (rules == null) {
             return;
         }
         rules.forEach(e -> e.setApp(app));
 
-        List<ParamFlowRuleCorrectEntity> entityList = rules.stream().map(rule -> {
-            ParamFlowRuleCorrectEntity entity = new ParamFlowRuleCorrectEntity();
+        List<AuthorityRuleCorrectEntity> entityList = rules.stream().map(rule -> {
+            AuthorityRuleCorrectEntity entity = new AuthorityRuleCorrectEntity();
             BeanUtils.copyProperties(rule, entity);
-
-            entity.setParamIdx(rule.getParamIdx());
-            entity.setParamFlowItemList(rule.getParamFlowItemList());
-
             return entity;
         }).collect(Collectors.toList());
 
-        configService.publishConfig(app + NacosConfigUtil.PARAM_DATA_ID_POSTFIX,
+        configService.publishConfig(app + NacosConfigUtil.AUTHORITY_DATA_ID_POSTFIX,
                 NacosConfigUtil.GROUP_ID, entityEncoder.convert(entityList));
     }
 }
